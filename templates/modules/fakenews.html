@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Fake News Detection and Reporting System{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #10 • NLP & Misinformation Classifier
+            </span>
+            <h2 class="fw-bold text-light mb-1">Fake News Detection & Reporting System</h2>
+            <p class="text-muted small mb-0">Linguistic anomaly detection, clickbait sentiment scoring, and verifiable source integrity scanner.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Input Article Form -->
+        <div class="col-lg-6">
+            <div class="vvk-card h-100">
+                <h5 class="fw-bold text-light mb-3"><i class="bi bi-shield-check text-danger me-2"></i> Submit Article / News for AI Audit</h5>
+                <form method="POST" action="{{ url_for('fakenews') }}">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Headline / News Title</label>
+                        <input type="text" name="title" class="form-control vvk-input" placeholder="e.g. SHOCKING: Miracle herbal drink cures all illnesses overnight!!!" required value="SHOCKING: Miracle herbal water cures all illnesses overnight without doctors!!!">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Source URL / Publisher Domain</label>
+                        <input type="text" name="source_url" class="form-control vvk-input" placeholder="e.g. https://viral-whatsapp-buzz.xyz" value="https://viral-whatsapp-buzz.xyz">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Article Content / Body Text</label>
+                        <textarea name="content" rows="6" class="form-control vvk-textarea" placeholder="Paste full article text here..." required>Scientists from hidden research labs reveal secret herbal remedy. Big pharma is trying to censor this post! Share urgently before it gets deleted from the internet!</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-vvk-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-shield-lock-fill"></i>
+                        <span>Scan Credibility with AI</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- AI Credibility Analysis Output -->
+        <div class="col-lg-6">
+            {% if result %}
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 mb-1">
+                                AI Verification Score
+                            </span>
+                            <h4 class="fw-bold text-light mb-0">Credibility Verdict</h4>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge {% if result.credibility_score >= 75 %}bg-success{% elif result.credibility_score >= 45 %}bg-warning text-dark{% else %}bg-danger{% endif %} fs-5 px-3 py-2">
+                                {{ result.prediction }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Credibility Meter -->
+                    <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25 mb-3 text-center">
+                        <small class="text-muted d-block mb-1">AI Truth / Authenticity Index</small>
+                        <h1 class="fw-bold {% if result.credibility_score >= 75 %}text-success{% elif result.credibility_score >= 45 %}text-warning{% else %}text-danger{% endif %} mb-0">
+                            {{ result.credibility_score }}%
+                        </h1>
+                        <div class="progress mt-2" style="height: 6px;">
+                            <div class="progress-bar {% if result.credibility_score >= 75 %}bg-success{% elif result.credibility_score >= 45 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ result.credibility_score }}%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Linguistic Markers Detected -->
+                    <div class="mb-3">
+                        <label class="small text-muted fw-bold text-uppercase d-block mb-1">Detected Linguistic Markers & Signals:</label>
+                        <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 text-light small lh-base">
+                            {{ result.linguistic_cues }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 text-muted small">
+                    <i class="bi bi-info-circle text-info me-1"></i> Flagged report recorded to college anti-misinformation database for community alert.
+                </div>
+            </div>
+            {% else %}
+            <div class="vvk-card text-center py-5 d-flex flex-column align-items-center justify-content-center h-100">
+                <i class="bi bi-shield-x text-muted fs-1 mb-3"></i>
+                <h5 class="text-light fw-bold">No Article Under Active Scan</h5>
+                <p class="text-muted small max-w-400">Submit an article title, source link, and body text on the left to verify authenticity.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Fake News Reports -->
+    <div class="vvk-card mt-4">
+        <h5 class="fw-bold text-light mb-3"><i class="bi bi-database-check text-danger me-2"></i> Verified Misinformation Database</h5>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                <thead>
+                    <tr class="text-muted border-secondary border-opacity-25 small">
+                        <th>Reported Headline</th>
+                        <th>Credibility Score</th>
+                        <th>Verdict</th>
+                        <th>Reporter</th>
+                        <th>Date Flagged</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reports %}
+                    <tr class="border-secondary border-opacity-10 small">
+                        <td>
+                            <div class="fw-bold text-light">{{ r.news_title }}</div>
+                            <small class="text-muted">{{ r.source_url or 'Direct Text Input' }}</small>
+                        </td>
+                        <td><strong class="{% if r.credibility_score >= 70 %}text-success{% else %}text-danger{% endif %}">{{ r.credibility_score }}%</strong></td>
+                        <td>
+                            <span class="badge {% if 'REAL' in r.prediction or 'LEGIT' in r.prediction %}bg-success{% elif 'SUSP' in r.prediction %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {{ r.prediction }}
+                            </span>
+                        </td>
+                        <td><small class="text-muted">{{ r.reported_by }}</small></td>
+                        <td><small class="text-muted">{{ r.created_at.strftime('%Y-%m-%d') }}</small></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">No verified reports registered yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

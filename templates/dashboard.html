@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+
+{% block title %}Master Portal Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Hero Banner -->
+    <div class="vvk-card mb-4 border-0" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(168, 85, 247, 0.25) 50%, rgba(30, 41, 59, 0.95) 100%);">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-primary bg-opacity-30 text-white border border-primary border-opacity-50 px-3 py-1 mb-2 rounded-pill fw-semibold">
+                    <i class="bi bi-patch-check-fill me-1 text-warning"></i> Vivekanandha College Resource Platform
+                </span>
+                <h1 class="display-6 fw-bold text-white mb-2">Welcome to VVK Multi-Project Hub</h1>
+                <p class="lead fs-6 mb-0" style="color: #f1f5f9; font-weight: 400;">
+                    A unified centralized hub consolidating <strong class="text-info">14 complete engineering and campus projects</strong> under a single full-stack architecture powered by Python & PostgreSQL.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="d-inline-flex flex-column align-items-lg-end">
+                    <div class="small text-white mb-1 fw-bold">System Status</div>
+                    <span class="badge bg-success bg-opacity-25 text-white border border-success px-3 py-2 rounded-pill fs-6 fw-semibold">
+                        <span class="pulse-dot me-2"></span> All 14 Nodes Operational
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="vvk-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-pill bg-danger bg-opacity-15 text-danger border border-danger border-opacity-25">
+                    <i class="bi bi-megaphone-fill"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-0 text-light">{{ stats.total_complaints }}</h4>
+                    <small class="text-muted" style="font-size: 0.75rem;">Complaints</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="vvk-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-pill bg-info bg-opacity-15 text-info border border-info border-opacity-25">
+                    <i class="bi bi-cloud-check-fill"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-0 text-light">{{ stats.total_files }}</h4>
+                    <small class="text-muted" style="font-size: 0.75rem;">Cloud Files</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="vvk-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-pill bg-warning bg-opacity-15 text-warning border border-warning border-opacity-25">
+                    <i class="bi bi-bus-front-fill"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-0 text-light">{{ stats.active_buses }}</h4>
+                    <small class="text-muted" style="font-size: 0.75rem;">Live Buses</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="vvk-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-pill bg-success bg-opacity-15 text-success border border-success border-opacity-25">
+                    <i class="bi bi-cart-check-fill"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-0 text-light">{{ stats.sports_products }}</h4>
+                    <small class="text-muted" style="font-size: 0.75rem;">Sports Gear</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="vvk-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-pill bg-primary bg-opacity-15 text-primary border border-primary border-opacity-25">
+                    <i class="bi bi-ticket-detailed-fill"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-0 text-light">{{ stats.event_registrations }}</h4>
+                    <small class="text-muted" style="font-size: 0.75rem;">Fest Entries</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="vvk-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-pill bg-secondary bg-opacity-25 text-warning border border-warning border-opacity-25">
+                    <i class="bi bi-tools"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-0 text-light">{{ stats.active_services }}</h4>
+                    <small class="text-muted" style="font-size: 0.75rem;">Bike Services</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 14 Project Grid Cards -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="fw-bold text-light mb-0"><i class="bi bi-collection-play-fill text-primary me-2"></i> All 14 Project Modules</h4>
+        <span class="text-muted small">Select any project module to launch its full features</span>
+    </div>
+
+    <div class="row g-3">
+        <!-- 1. Complaint Management System -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-25">Module #01</span>
+                        <i class="bi bi-megaphone-fill text-danger fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Complaint Management System</h5>
+                    <p class="text-muted small">Grievance lodging, priority categorization, status workflow (Open, In-Progress, Resolved).</p>
+                </div>
+                <a href="{{ url_for('complaints') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. Cloud File Management System -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-info bg-opacity-20 text-info border border-info border-opacity-25">Module #02</span>
+                        <i class="bi bi-cloud-arrow-up-fill text-info fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Cloud File Management</h5>
+                    <p class="text-muted small">Secure notes & assignments repository with file type detector, storage tracker and instant download.</p>
+                </div>
+                <a href="{{ url_for('cloud_files') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 3. Student Performance Prediction Using AI -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25">Module #03 • AI</span>
+                        <i class="bi bi-graph-up-arrow text-primary fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Student Performance AI</h5>
+                    <p class="text-muted small">Predict final GPA, risk level, and academic guidance based on internal marks, attendance, and study hours.</p>
+                </div>
+                <a href="{{ url_for('student_prediction') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 4. Bus Tracking System -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25">Module #04</span>
+                        <i class="bi bi-bus-front-fill text-warning fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Bus Tracking System</h5>
+                    <p class="text-muted small">Real-time GPS telemetry, route progression, ETA calculations, speed metrics, and driver contact.</p>
+                </div>
+                <a href="{{ url_for('bus_tracking') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 5. Headline In India -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25">Module #05</span>
+                        <i class="bi bi-newspaper text-success fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Headline In India</h5>
+                    <p class="text-muted small">Curated Indian news portal with category filtering (Tech, Education, Sports, National) and instant posting.</p>
+                </div>
+                <a href="{{ url_for('headlines') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 6. Ecom for Sports Product -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25">Module #06</span>
+                        <i class="bi bi-bag-check-fill text-warning fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">E-Commerce for Sports</h5>
+                    <p class="text-muted small">College sports store with gear catalogue, shopping cart, UPI checkout modal, and order tracking.</p>
+                </div>
+                <a href="{{ url_for('sports_ecom') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 7. AI Code Reviewer and Bug Fixer -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-info bg-opacity-20 text-info border border-info border-opacity-25">Module #07 • AI</span>
+                        <i class="bi bi-code-slash text-info fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">AI Code Reviewer & Fixer</h5>
+                    <p class="text-muted small">Multi-language code analyzer highlighting runtime bugs, security vulnerabilities, and clean refactors.</p>
+                </div>
+                <a href="{{ url_for('ai_code_reviewer') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 8. Student Assessment using AI -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25">Module #08 • AI</span>
+                        <i class="bi bi-check2-circle text-primary fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Student Assessment AI</h5>
+                    <p class="text-muted small">Interactive automated assessment engine calculating topic strengths, weakness areas, and AI feedback.</p>
+                </div>
+                <a href="{{ url_for('student_assessment') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 9. CRM System -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25">Module #09</span>
+                        <i class="bi bi-people-fill text-success fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">CRM Management System</h5>
+                    <p class="text-muted small">Corporate relations & placement CRM tracking recruiter pipeline stages, deal values, and interaction notes.</p>
+                </div>
+                <a href="{{ url_for('crm') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 10. Fake News Detection System -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-25">Module #10 • AI</span>
+                        <i class="bi bi-shield-x text-danger fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Fake News Detection</h5>
+                    <p class="text-muted small">Linguistic cue analysis, sensationalism meter, and credibility score classifier for suspicious articles.</p>
+                </div>
+                <a href="{{ url_for('fakenews') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 11. Gold & Silver Fake Detection -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25">Module #11</span>
+                        <i class="bi bi-gem text-warning fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Gold & Silver Purity Test</h5>
+                    <p class="text-muted small">Archimedes density calculator, Karat/Hallmark classifier, and acid/magnet counterfeit detector.</p>
+                </div>
+                <a href="{{ url_for('gold_silver') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 12. Cricket Club Management -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-25">Module #12</span>
+                        <i class="bi bi-trophy-fill text-danger fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Cricket Club Management</h5>
+                    <p class="text-muted small">Team roster stats, match scorecards, strike rate calculations, and upcoming tournament fixtures.</p>
+                </div>
+                <a href="{{ url_for('cricket_club') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 13. Two Wheeler Service and Maintenance -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25">Module #13</span>
+                        <i class="bi bi-wrench-adjustable-circle-fill text-success fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Two Wheeler Service</h5>
+                    <p class="text-muted small">Job card booking, mechanic assignment, cost estimations, and real-time service stage progression.</p>
+                </div>
+                <a href="{{ url_for('two_wheeler') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 14. Intercollege Registration Management -->
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25">Module #14</span>
+                        <i class="bi bi-ticket-perforated-fill text-primary fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-2">Intercollege Registration</h5>
+                    <p class="text-muted small">Technical symposium entry management, team registration, unique pass generator, and attendee tracking.</p>
+                </div>
+                <a href="{{ url_for('intercollege') }}" class="btn btn-vvk-outline btn-sm w-100 mt-3 d-flex align-items-center justify-content-between">
+                    <span>Open Module</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaint Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #01 • Campus Governance
+            </span>
+            <h2 class="fw-bold text-light mb-1">Complaint Management System</h2>
+            <p class="text-muted small mb-0">File, categorize, and track resolution status of campus and hostel grievances in real-time.</p>
+        </div>
+        <button class="btn btn-vvk-primary" data-bs-toggle="modal" data-bs-target="#newComplaintModal">
+            <i class="bi bi-plus-circle-fill me-1"></i> Lodge New Complaint
+        </button>
+    </div>
+
+    <!-- Complaints Summary Table -->
+    <div class="vvk-card">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold text-light mb-0"><i class="bi bi-card-checklist text-danger me-2"></i> Registered Grievances & Tickets</h5>
+            <span class="text-muted small">Total: {{ complaints|length }} Complaints</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                <thead>
+                    <tr class="text-muted border-secondary border-opacity-25">
+                        <th>Ticket ID</th>
+                        <th>Student & Reg No</th>
+                        <th>Department</th>
+                        <th>Category</th>
+                        <th>Issue Summary</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Admin Remark</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in complaints %}
+                    <tr class="border-secondary border-opacity-10">
+                        <td><code class="text-info fw-bold">#VVK-G{{ "%03d"|format(c.id) }}</code></td>
+                        <td>
+                            <div class="fw-bold text-light">{{ c.student_name }}</div>
+                            <small class="text-muted">{{ c.reg_number }}</small>
+                        </td>
+                        <td><small class="text-muted">{{ c.department }}</small></td>
+                        <td>
+                            <span class="badge bg-dark border border-secondary text-light">{{ c.category }}</span>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-light text-truncate" style="max-width: 260px;" title="{{ c.title }}">{{ c.title }}</div>
+                            <small class="text-muted text-truncate d-block" style="max-width: 260px;">{{ c.description }}</small>
+                        </td>
+                        <td>
+                            <span class="badge {% if c.priority == 'Critical' or c.priority == 'High' %}bg-danger{% elif c.priority == 'Medium' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                {{ c.priority }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if c.status == 'Open' %}
+                                <span class="badge-vvk-open"><i class="bi bi-clock-history me-1"></i> Open</span>
+                            {% elif c.status == 'In-Progress' %}
+                                <span class="badge-vvk-progress"><i class="bi bi-gear-wide-connected me-1"></i> In-Progress</span>
+                            {% else %}
+                                <span class="badge-vvk-resolved"><i class="bi bi-check2-all me-1"></i> Resolved</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted fst-italic">{{ c.admin_remark or 'Under Review' }}</small>
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Update
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark-custom dropdown-menu-end">
+                                    <li><a class="dropdown-item dropdown-item-custom" href="javascript:void(0)" onclick="quickUpdateStatus({{ c.id }}, 'In-Progress', 'Assigned to technical repair crew')"><i class="bi bi-gear text-info"></i> Mark In-Progress</a></li>
+                                    <li><a class="dropdown-item dropdown-item-custom" href="javascript:void(0)" onclick="quickUpdateStatus({{ c.id }}, 'Resolved', 'Issue successfully inspected and resolved')"><i class="bi bi-check-circle text-success"></i> Mark Resolved</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">No grievances registered yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Lodge New Complaint Modal -->
+<div class="modal fade" id="newComplaintModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="background: #111827; border: 1px solid var(--border-color); border-radius: 16px;">
+            <div class="modal-header border-secondary border-opacity-25">
+                <h5 class="modal-title text-light fw-bold"><i class="bi bi-megaphone-fill text-danger me-2"></i> Lodge Grievance Ticket</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('complaints') }}">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Student Name</label>
+                            <input type="text" name="student_name" class="form-control vvk-input" placeholder="e.g. Anand Kumar" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Register / Roll Number</label>
+                            <input type="text" name="reg_number" class="form-control vvk-input" placeholder="e.g. VVK23CS042" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Department</label>
+                            <select name="department" class="form-select vvk-select" required>
+                                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics & Communication">Electronics & Communication</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Biotechnology">Biotechnology</option>
+                                <option value="Management Studies (MBA)">Management Studies (MBA)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Grievance Category</label>
+                            <select name="category" class="form-select vvk-select" required>
+                                <option value="Lab & Computing">Lab & Computing</option>
+                                <option value="Hostel & Accommodation">Hostel & Accommodation</option>
+                                <option value="Campus Transport">Campus Transport</option>
+                                <option value="Academic / Curriculum">Academic / Curriculum</option>
+                                <option value="Mess & Canteen">Mess & Canteen</option>
+                                <option value="Infrastructure & Power">Infrastructure & Power</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted small fw-semibold">Complaint Subject / Title</label>
+                            <input type="text" name="title" class="form-control vvk-input" placeholder="Brief subject of the issue" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted small fw-semibold">Detailed Description</label>
+                            <textarea name="description" rows="4" class="form-control vvk-textarea" placeholder="Provide complete specifics, location/room number, and nature of the issue..." required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Severity / Priority</label>
+                            <select name="priority" class="form-select vvk-select">
+                                <option value="Low">Low (Routine)</option>
+                                <option value="Medium" selected>Medium (Standard)</option>
+                                <option value="High">High (Impacting Class / Lab)</option>
+                                <option value="Critical">Critical (Urgent Attention)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-vvk-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-vvk-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function quickUpdateStatus(id, newStatus, remark) {
+    const res = await postJSON(`/api/complaints/${id}/status`, {
+        status: newStatus,
+        admin_remark: remark
+    });
+    if(res.success) {
+        location.reload();
+    }
+}
+</script>
+{% endblock %}

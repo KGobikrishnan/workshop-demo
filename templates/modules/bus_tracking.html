@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Bus Tracking System{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #04 • Campus IoT & GPS Telemetry
+            </span>
+            <h2 class="fw-bold text-light mb-1">Bus Tracking System</h2>
+            <p class="text-muted small mb-0">Live collegiate fleet monitoring with route progression, simulated GPS coordinates, dynamic ETA, and driver telemetry.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-dark border border-secondary text-light px-3 py-2">
+                <span class="pulse-dot me-2"></span> GPS Telemetry Sync: <span class="text-success fw-bold">Live (5s Refresh)</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Active Buses Cards -->
+    <div class="row g-4 mb-4">
+        {% for b in routes %}
+        <div class="col-lg-4">
+            <div class="vvk-card h-100 position-relative">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25 mb-1">{{ b.bus_number }}</span>
+                        <h5 class="fw-bold text-light mb-0">{{ b.route_name }}</h5>
+                    </div>
+                    <span class="badge {% if 'Delayed' in b.status %}bg-danger{% else %}bg-success{% endif %} bg-opacity-25 text-light border border-secondary">
+                        {{ b.status }}
+                    </span>
+                </div>
+
+                <!-- Telemetry Stats -->
+                <div class="row g-2 text-center my-3">
+                    <div class="col-4">
+                        <div class="p-2 rounded bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                            <small class="text-muted d-block" style="font-size: 0.72rem;">ETA Campus</small>
+                            <span class="fw-bold text-warning fs-6">{{ b.eta_minutes }} Mins</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 rounded bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                            <small class="text-muted d-block" style="font-size: 0.72rem;">Current Speed</small>
+                            <span class="fw-bold text-info fs-6">{{ b.speed_kmph }} km/h</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 rounded bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                            <small class="text-muted d-block" style="font-size: 0.72rem;">Bus Capacity</small>
+                            <span class="fw-bold text-success fs-6">{{ b.capacity_pct }}% Full</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current & Next Stop -->
+                <div class="p-3 rounded-3 mb-3 bg-dark bg-opacity-75 border border-secondary border-opacity-25">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-geo-alt-fill text-danger"></i>
+                        <div class="small">
+                            <span class="text-muted">Current Location:</span>
+                            <strong class="text-light d-block">{{ b.current_stop }}</strong>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-right-circle text-primary"></i>
+                        <div class="small">
+                            <span class="text-muted">Next Stop:</span>
+                            <strong class="text-info d-block">{{ b.next_stop }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Route Progression Steps -->
+                <div class="mb-3">
+                    <small class="text-muted fw-semibold d-block mb-2"><i class="bi bi-signpost-split me-1"></i> Route Waypoints:</small>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for stop in b.parsed_stops %}
+                        <span class="badge {% if stop == b.current_stop %}bg-danger text-light{% else %}bg-dark text-muted border border-secondary border-opacity-25{% endif %}" style="font-size: 0.75rem;">
+                            {{ stop }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Driver Contact & Simulation Controls -->
+                <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="small fw-bold text-light"><i class="bi bi-person-badge me-1"></i> {{ b.driver_name }}</div>
+                        <small class="text-muted">{{ b.driver_phone }}</small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-warning" onclick="simulateGpsStep({{ b.id }}, '{{ b.current_stop }}')">
+                        <i class="bi bi-play-circle me-1"></i> Advance Bus
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Live Map Radar Simulation Banner -->
+    <div class="vvk-card text-center p-4" style="background: radial-gradient(circle at center, rgba(16, 185, 129, 0.08) 0%, rgba(17, 24, 39, 0.95) 70%);">
+        <i class="bi bi-broadcast text-success fs-1 mb-2"></i>
+        <h5 class="fw-bold text-light">Vivekanandha GPS Transit Command Center</h5>
+        <p class="text-muted small mb-3">All campus transit vehicles transmit high-precision latitude/longitude coordinate packets via 4G/LTE IoT gateway units.</p>
+        <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 px-4 py-2 rounded-pill">
+            <i class="bi bi-shield-fill-check me-1"></i> Geofence Campus Boundary: Active & Monitored
+        </span>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function simulateGpsStep(busId, currentStop) {
+    const randomEta = Math.max(2, Math.floor(Math.random() * 20));
+    const randomSpeed = (35 + Math.random() * 25).toFixed(1);
+    
+    const res = await postJSON(`/api/bus/${busId}/update-location`, {
+        current_stop: "Rasipuram Bypass Transit Hub",
+        next_stop: "VVK Central Gate",
+        eta_minutes: randomEta,
+        speed_kmph: randomSpeed,
+        status: "On-Time (Telemetry Active)"
+    });
+    
+    if(res.success) {
+        location.reload();
+    }
+}
+</script>
+{% endblock %}

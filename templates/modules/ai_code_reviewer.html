@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Code Reviewer and Bug Fixer{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-info bg-opacity-20 text-info border border-info border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #07 • Developer Tooling & AI Static Analyzer
+            </span>
+            <h2 class="fw-bold text-light mb-1">AI Code Reviewer & Bug Fixer</h2>
+            <p class="text-muted small mb-0">Automated static code analysis, vulnerability scanning, time complexity auditing, and AI refactored code fixes.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Code Input Form -->
+        <div class="col-lg-6">
+            <div class="vvk-card h-100">
+                <form method="POST" action="{{ url_for('ai_code_reviewer') }}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-light mb-0"><i class="bi bi-terminal-fill text-info me-2"></i> Source Code Input</h5>
+                        <select name="language" class="form-select form-select-sm vvk-select" style="max-width: 150px;">
+                            <option value="python" {% if lang == 'python' %}selected{% endif %}>Python 3</option>
+                            <option value="javascript" {% if lang == 'javascript' %}selected{% endif %}>JavaScript</option>
+                            <option value="cpp" {% if lang == 'cpp' %}selected{% endif %}>C / C++</option>
+                            <option value="sql" {% if lang == 'sql' %}selected{% endif %}>SQL Query</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <textarea name="code" rows="14" class="form-control vvk-textarea code-font" placeholder="Paste your code snippet here to review..." required style="font-size: 0.9rem; line-height: 1.5;">{{ input_code or 'def fetch_student_records(db_conn, student_id):\n    # Unsafe query pattern\n    query = "SELECT * FROM students WHERE id = " + str(student_id)\n    cursor = db_conn.cursor()\n    try:\n        cursor.execute(query)\n        return cursor.fetchall()\n    except:\n        print "Error querying database"\n        return None' }}</textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-vvk-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                            <span>Run AI Inspection & Generate Fix</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- AI Analysis Results & Refactored Code -->
+        <div class="col-lg-6">
+            {% if output %}
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <!-- Top Diagnostics Bar -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 mb-1">
+                                <i class="bi bi-shield-check me-1"></i> Audit Complete
+                            </span>
+                            <h5 class="fw-bold text-light mb-0">Diagnostics Report</h5>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-info bg-opacity-20 text-info border border-info border-opacity-25 px-3 py-2 fs-6">
+                                Complexity: <strong>{{ output.complexity }}</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Bugs Detected -->
+                    <div class="mb-3">
+                        <label class="small text-danger fw-bold text-uppercase d-flex align-items-center gap-1 mb-1">
+                            <i class="bi bi-bug-fill"></i> Detected Defects & Smells ({{ output.bugs|length }}):
+                        </label>
+                        <div class="d-flex flex-column gap-1">
+                            {% for b in output.bugs %}
+                            <div class="p-2 rounded bg-dark border border-danger border-opacity-25 text-light small">
+                                <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> {{ b }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Security Vulnerabilities -->
+                    <div class="mb-3">
+                        <label class="small text-warning fw-bold text-uppercase d-flex align-items-center gap-1 mb-1">
+                            <i class="bi bi-shield-lock-fill"></i> Security Audit ({{ output.security|length }}):
+                        </label>
+                        <div class="d-flex flex-column gap-1">
+                            {% for s in output.security %}
+                            <div class="p-2 rounded bg-dark border border-warning border-opacity-25 text-light small">
+                                <i class="bi bi-shield-slash text-warning me-1"></i> {{ s }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Refactored Clean Code -->
+                    <div class="mb-3">
+                        <label class="small text-success fw-bold text-uppercase d-flex align-items-center gap-1 mb-1">
+                            <i class="bi bi-check-all"></i> AI Optimized & Patched Code:
+                        </label>
+                        <pre class="p-3 rounded-3 bg-dark border border-success border-opacity-25 text-light code-font small mb-0" style="max-height: 220px; overflow-y: auto;"><code>{{ output.fixed_code }}</code></pre>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Quality Index: <strong class="text-info">{{ output.optimization_score }}/100</strong></span>
+                    <button class="btn btn-sm btn-outline-info" onclick="navigator.clipboard.writeText(`{{ output.fixed_code|escape }}`); alert('Refactored code copied to clipboard!');">
+                        <i class="bi bi-clipboard-check me-1"></i> Copy Patched Code
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <div class="vvk-card text-center py-5 d-flex flex-column align-items-center justify-content-center h-100">
+                <i class="bi bi-code-square text-muted fs-1 mb-3"></i>
+                <h5 class="text-light fw-bold">Awaiting Code Submission</h5>
+                <p class="text-muted small max-w-400">Paste your code on the left and select the programming language to run AI security and defect analysis.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

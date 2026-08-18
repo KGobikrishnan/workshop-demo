@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Gold and Silver Fake / Purity Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #11 • Archimedes Hydrostatic & Metallurgical Testing
+            </span>
+            <h2 class="fw-bold text-light mb-1">Gold & Silver Fake / Purity Detection</h2>
+            <p class="text-muted small mb-0">Compute hydrostatic density, hallmark BIS standard verification, acid response checklist, and counterfeit risk classification.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Input Form -->
+        <div class="col-lg-5">
+            <div class="vvk-card h-100">
+                <h5 class="fw-bold text-light mb-3"><i class="bi bi-calculator text-warning me-2"></i> Hydrostatic Density Calculator</h5>
+                <form method="POST" action="{{ url_for('gold_silver') }}">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Precious Metal Type</label>
+                        <select name="metal_type" class="form-select vvk-select">
+                            <option value="Gold" selected>Gold (Au)</option>
+                            <option value="Silver">Silver (Ag)</option>
+                        </select>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small fw-semibold">Weight in Air (grams)</label>
+                            <input type="number" step="0.01" name="weight_air" class="form-control vvk-input" value="10.0" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small fw-semibold">Weight in Water (grams)</label>
+                            <input type="number" step="0.01" name="weight_water" class="form-control vvk-input" value="9.48" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">BIS Hallmark Stamping (Optional)</label>
+                        <input type="text" name="hallmark" class="form-control vvk-input" placeholder="e.g. BIS 916 / HUID-98234" value="BIS 916">
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label text-muted small fw-semibold">Nitric Acid Test</label>
+                            <select name="acid_test" class="form-select vvk-select">
+                                <option value="No Reaction (Pass)">No Reaction (Pass)</option>
+                                <option value="Turned Green (Copper/Fake)">Turned Green (Fake)</option>
+                                <option value="Milky White (Silver)">Milky White</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small fw-semibold">Neodymium Magnet Test</label>
+                            <select name="magnet_test" class="form-select vvk-select">
+                                <option value="Non-Magnetic (Pass)">Non-Magnetic (Pass)</option>
+                                <option value="Attracted (Iron/Fake)">Attracted (Fake Core)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-vvk-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-gem"></i>
+                        <span>Calculate Purity & Karat</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Result Card -->
+        <div class="col-lg-7">
+            {% if result %}
+            <div class="vvk-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25 mb-1">
+                                Hydrostatic Inspection Results
+                            </span>
+                            <h4 class="fw-bold text-light mb-0">{{ result.estimated_karat }}</h4>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge {% if 'GENUINE' in result.verdict %}bg-success{% elif 'ALLOY' in result.verdict %}bg-warning text-dark{% else %}bg-danger{% endif %} fs-6 px-3 py-2">
+                                {{ result.verdict }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 my-3 text-center">
+                        <div class="col-4">
+                            <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                                <small class="text-muted d-block mb-1">Calculated Density</small>
+                                <h4 class="fw-bold text-info mb-0">{{ result.density }} g/cm³</h4>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                                <small class="text-muted d-block mb-1">Estimated Purity</small>
+                                <h4 class="fw-bold text-warning mb-0">{{ result.purity_percentage }}%</h4>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                                <small class="text-muted d-block mb-1">Metal Type</small>
+                                <h4 class="fw-bold text-light mb-0">{{ result.metal_type }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reference Benchmarks -->
+                    <div class="p-3 rounded-3 bg-dark bg-opacity-75 border border-secondary border-opacity-25 mt-3">
+                        <h6 class="fw-bold text-light mb-2 small"><i class="bi bi-info-circle text-info me-1"></i> Standard Density Benchmarks:</h6>
+                        <ul class="text-muted small mb-0 ps-3">
+                            <li>24K Pure Gold: <strong>19.32 g/cm³</strong> (99.9% Purity)</li>
+                            <li>22K Hallmark Gold (BIS 916): <strong>17.70 - 17.80 g/cm³</strong> (91.6% Purity)</li>
+                            <li>18K Gold (Hallmark 750): <strong>15.50 g/cm³</strong> (75.0% Purity)</li>
+                            <li>Pure Silver (999) / Sterling (925): <strong>10.36 - 10.49 g/cm³</strong></li>
+                            <li>Fake Brass / Copper core: <strong>8.40 - 8.90 g/cm³</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-top border-secondary border-opacity-25 text-end">
+                    <small class="text-muted">Certified by Vivekanandha Precision Physics & Material Testing Lab</small>
+                </div>
+            </div>
+            {% else %}
+            <div class="vvk-card text-center py-5 d-flex flex-column align-items-center justify-content-center h-100">
+                <i class="bi bi-gem text-muted fs-1 mb-3"></i>
+                <h5 class="text-light fw-bold">Ready for Metallurgical Density Computation</h5>
+                <p class="text-muted small max-w-400">Input hydrostatic weight in air and submerged water weight on the left form to calculate accurate metal density.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Purity History Table -->
+    <div class="vvk-card mt-4">
+        <h5 class="fw-bold text-light mb-3"><i class="bi bi-clock-history text-warning me-2"></i> Metallurgical Test Logs</h5>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                <thead>
+                    <tr class="text-muted border-secondary border-opacity-25 small">
+                        <th>Metal</th>
+                        <th>Air / Water Weight</th>
+                        <th>Density</th>
+                        <th>Karat Classification</th>
+                        <th>Purity %</th>
+                        <th>Verdict</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in history %}
+                    <tr class="border-secondary border-opacity-10 small">
+                        <td><strong class="text-light">{{ h.metal_type }}</strong></td>
+                        <td>{{ h.weight_in_air_g }}g / {{ h.weight_in_water_g }}g</td>
+                        <td><code class="text-info">{{ h.calculated_density }} g/cm³</code></td>
+                        <td><span class="badge bg-warning bg-opacity-20 text-warning">{{ h.estimated_karat }}</span></td>
+                        <td>{{ h.purity_percentage }}%</td>
+                        <td>
+                            <span class="badge {% if 'GENUINE' in h.verdict %}bg-success{% elif 'ALLOY' in h.verdict %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {{ h.verdict }}
+                            </span>
+                        </td>
+                        <td><small class="text-muted">{{ h.created_at.strftime('%Y-%m-%d') }}</small></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">No test records saved yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

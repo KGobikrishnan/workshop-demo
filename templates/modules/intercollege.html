@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Intercollegiate Registration Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #14 • National Technical Symposium & Hackathon Portal
+            </span>
+            <h2 class="fw-bold text-light mb-1">Intercollegiate Registration Management</h2>
+            <p class="text-muted small mb-0">Participant registration desk, multi-college team pass generation, automated badge ID issuance, and event attendance tracking.</p>
+        </div>
+        <button class="btn btn-vvk-primary" data-bs-toggle="modal" data-bs-target="#newRegModal">
+            <i class="bi bi-ticket-perforated-fill me-1"></i> Register Delegate / Team
+        </button>
+    </div>
+
+    <!-- Active Events Overview -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="vvk-card p-3 border-primary border-opacity-25">
+                <span class="badge bg-primary mb-2">Flagship Hackathon</span>
+                <h5 class="fw-bold text-light mb-1">24h AI Generative Hackathon</h5>
+                <small class="text-muted d-block mb-2">Team Size: 3-4 Members • Prize Pool: ₹50,000</small>
+                <span class="badge bg-dark border border-secondary text-info"><i class="bi bi-geo-alt me-1"></i> VVK Tech Park Lab 4</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="vvk-card p-3 border-success border-opacity-25">
+                <span class="badge bg-success mb-2">Coding Championship</span>
+                <h5 class="fw-bold text-light mb-1">Speed Debugging & Algorithmic Sprint</h5>
+                <small class="text-muted d-block mb-2">Individual Entry • Prize Pool: ₹25,000</small>
+                <span class="badge bg-dark border border-secondary text-info"><i class="bi bi-geo-alt me-1"></i> Computing Center 2</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="vvk-card p-3 border-warning border-opacity-25">
+                <span class="badge bg-warning text-dark mb-2">Robotics Arena</span>
+                <h5 class="fw-bold text-light mb-1">Robo-Soccer & Line Follower Clash</h5>
+                <small class="text-muted d-block mb-2">Team Size: 2-4 Members • Prize Pool: ₹35,000</small>
+                <span class="badge bg-dark border border-secondary text-info"><i class="bi bi-geo-alt me-1"></i> Indoor Auditorium</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registrations Directory Table -->
+    <div class="vvk-card">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold text-light mb-0"><i class="bi bi-people-fill text-primary me-2"></i> Registered Intercollegiate Participants</h5>
+            <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25 px-3 py-2">
+                Total Registered: {{ registrations|length }} Candidates
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                <thead>
+                    <tr class="text-muted border-secondary border-opacity-25 small">
+                        <th>Official Ticket Pass</th>
+                        <th>Lead Candidate / Team</th>
+                        <th>College / Institution</th>
+                        <th>Department</th>
+                        <th>Registered Event</th>
+                        <th>Team Size</th>
+                        <th>Members List</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in registrations %}
+                    <tr class="border-secondary border-opacity-10 small">
+                        <td><code class="text-info fw-bold">{{ r.ticket_id }}</code></td>
+                        <td>
+                            <div class="fw-bold text-light">{{ r.participant_name }}</div>
+                            <small class="text-muted">{{ r.email }} • {{ r.phone }}</small>
+                        </td>
+                        <td><small class="text-light fw-semibold">{{ r.college_name }}</small></td>
+                        <td><small class="text-muted">{{ r.department }}</small></td>
+                        <td><span class="badge bg-primary bg-opacity-20 text-primary">{{ r.event_category }}</span></td>
+                        <td><span class="badge bg-dark border border-secondary">{{ r.team_size }} Member(s)</span></td>
+                        <td><small class="text-muted d-block text-truncate" style="max-width: 180px;" title="{{ r.team_members }}">{{ r.team_members or 'N/A' }}</small></td>
+                        <td><span class="badge bg-success bg-opacity-25 text-success">{{ r.payment_status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No symposium registrations recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- New Registration Modal -->
+<div class="modal fade" id="newRegModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="background: #111827; border: 1px solid var(--border-color); border-radius: 16px;">
+            <div class="modal-header border-secondary border-opacity-25">
+                <h5 class="modal-title text-light fw-bold"><i class="bi bi-ticket-perforated-fill text-primary me-2"></i> Register for Intercollegiate Symposium</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('intercollege') }}">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Lead Participant Name</label>
+                            <input type="text" name="participant_name" class="form-control vvk-input" placeholder="e.g. Vignesh Waran" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Email ID</label>
+                            <input type="email" name="email" class="form-control vvk-input" placeholder="e.g. vignesh.w@college.edu" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Phone Number</label>
+                            <input type="text" name="phone" class="form-control vvk-input" placeholder="e.g. +91 98421 11009" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">College / University Name</label>
+                            <input type="text" name="college_name" class="form-control vvk-input" placeholder="e.g. PSG Tech / CIT / Kongu" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Department</label>
+                            <input type="text" name="department" class="form-control vvk-input" placeholder="e.g. Computer Science / IT" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Event Category</label>
+                            <select name="event_category" class="form-select vvk-select">
+                                <option value="24h AI Generative Hackathon">24h AI Generative Hackathon</option>
+                                <option value="Speed Debugging & Algorithmic Sprint">Speed Debugging & Algorithmic Sprint</option>
+                                <option value="Robo-Soccer & Line Follower Clash">Robo-Soccer & Line Follower Clash</option>
+                                <option value="National Level Paper Presentation">National Level Paper Presentation</option>
+                                <option value="IPL Strategic Mega Auction">IPL Strategic Mega Auction</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small fw-semibold">Team Size</label>
+                            <input type="number" name="team_size" min="1" max="5" class="form-control vvk-input" value="1" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label text-muted small fw-semibold">Team Members List (Names & Emails)</label>
+                            <input type="text" name="team_members" class="form-control vvk-input" placeholder="e.g. Vignesh (Lead), Karthik, Meena">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-vvk-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-vvk-primary">Complete Delegate Registration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

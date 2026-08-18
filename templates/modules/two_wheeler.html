@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Two Wheeler Service and Maintenance{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #13 • Automotive Workshop & Job-Card Management
+            </span>
+            <h2 class="fw-bold text-light mb-1">Two Wheeler Service & Maintenance</h2>
+            <p class="text-muted small mb-0">Campus automobile service bay tracking job cards, estimated maintenance costs, technician assignment, and delivery lifecycle.</p>
+        </div>
+        <button class="btn btn-vvk-primary" data-bs-toggle="modal" data-bs-target="#newServiceModal">
+            <i class="bi bi-wrench-adjustable me-1"></i> Book New Service Slot
+        </button>
+    </div>
+
+    <!-- Active Job Cards Table -->
+    <div class="vvk-card">
+        <h5 class="fw-bold text-light mb-3"><i class="bi bi-card-list text-success me-2"></i> Workshop Job Cards</h5>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                <thead>
+                    <tr class="text-muted border-secondary border-opacity-25 small">
+                        <th>Job Card ID</th>
+                        <th>Customer</th>
+                        <th>Vehicle & Reg No</th>
+                        <th>Service Type</th>
+                        <th>Issues Reported</th>
+                        <th>Est. Cost</th>
+                        <th>Assigned Mechanic</th>
+                        <th>Status</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in services %}
+                    <tr class="border-secondary border-opacity-10 small">
+                        <td><code class="text-info fw-bold">#JOB-{{ "%03d"|format(s.id) }}</code></td>
+                        <td>
+                            <div class="fw-bold text-light">{{ s.customer_name }}</div>
+                            <small class="text-muted">{{ s.phone_number }}</small>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-light">{{ s.bike_model }}</div>
+                            <span class="badge bg-dark border border-secondary text-warning">{{ s.vehicle_number }}</span>
+                        </td>
+                        <td><span class="badge bg-primary bg-opacity-20 text-primary">{{ s.service_type }}</span></td>
+                        <td><small class="text-muted d-block text-truncate" style="max-width: 220px;">{{ s.issues_reported }}</small></td>
+                        <td><strong class="text-light">₹{{ "%.0f"|format(s.estimated_cost) }}</strong></td>
+                        <td><small class="text-info"><i class="bi bi-person-gear me-1"></i>{{ s.mechanic_assigned }}</small></td>
+                        <td>
+                            <span class="badge {% if s.service_status == 'Ready for Delivery' %}bg-success{% elif s.service_status == 'In-Progress' %}bg-info{% else %}bg-warning text-dark{% endif %}">
+                                {{ s.service_status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Status</button>
+                                <ul class="dropdown-menu dropdown-menu-dark-custom dropdown-menu-end">
+                                    <li><a class="dropdown-item dropdown-item-custom" href="javascript:void(0)" onclick="updateServiceStatus({{ s.id }}, 'In-Progress')">In-Progress</a></li>
+                                    <li><a class="dropdown-item dropdown-item-custom" href="javascript:void(0)" onclick="updateServiceStatus({{ s.id }}, 'Quality Check')">Quality Check</a></li>
+                                    <li><a class="dropdown-item dropdown-item-custom" href="javascript:void(0)" onclick="updateServiceStatus({{ s.id }}, 'Ready for Delivery')">Ready for Delivery</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">No active workshop bookings.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Book Service Modal -->
+<div class="modal fade" id="newServiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="background: #111827; border: 1px solid var(--border-color); border-radius: 16px;">
+            <div class="modal-header border-secondary border-opacity-25">
+                <h5 class="modal-title text-light fw-bold"><i class="bi bi-tools text-success me-2"></i> Open Service Job Card</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('two_wheeler') }}">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Customer / Owner Name</label>
+                            <input type="text" name="customer_name" class="form-control vvk-input" placeholder="e.g. Ramesh Kannan" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Phone Number</label>
+                            <input type="text" name="phone_number" class="form-control vvk-input" placeholder="e.g. +91 98421 77654" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Bike / Scooter Model</label>
+                            <input type="text" name="bike_model" class="form-control vvk-input" placeholder="e.g. Yamaha R15 V4 / Activa 6G" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Registration Number</label>
+                            <input type="text" name="vehicle_number" class="form-control vvk-input" placeholder="e.g. TN-34-BZ-7701" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Service Category</label>
+                            <select name="service_type" class="form-select vvk-select">
+                                <option value="General Periodic Service">General Periodic Service</option>
+                                <option value="Synthetic Engine Oil + Filter">Synthetic Engine Oil + Filter</option>
+                                <option value="Disc Brake Overhaul & Bleeding">Disc Brake Overhaul & Bleeding</option>
+                                <option value="Chain Sprocket Replacement">Chain Sprocket Replacement</option>
+                                <option value="Electrical & Battery Diagnostics">Electrical & Battery Diagnostics</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Estimated Cost (₹)</label>
+                            <input type="number" name="estimated_cost" class="form-control vvk-input" value="1250" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted small fw-semibold">Reported Complaints / Symptoms</label>
+                            <textarea name="issues_reported" rows="3" class="form-control vvk-textarea" placeholder="Detail any engine rattling, cold start issues, alignment vibration..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-vvk-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-vvk-primary">Create Job Card</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function updateServiceStatus(id, newStatus) {
+    const res = await postJSON(`/api/two-wheeler/${id}/status`, { service_status: newStatus });
+    if(res.success) location.reload();
+}
+</script>
+{% endblock %}

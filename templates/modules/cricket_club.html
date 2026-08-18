@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Cricket Club Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #12 • Sports Administration & Live Match Center
+            </span>
+            <h2 class="fw-bold text-light mb-1">Cricket Club Management System</h2>
+            <p class="text-muted small mb-0">Vivekanandha Warriors team roster, batting averages, bowling strike rates, and tournament fixtures.</p>
+        </div>
+        <button class="btn btn-vvk-primary" data-bs-toggle="modal" data-bs-target="#addPlayerModal">
+            <i class="bi bi-person-plus-fill me-1"></i> Register Player
+        </button>
+    </div>
+
+    <!-- Match Schedules / Scorecards -->
+    <div class="row g-4 mb-4">
+        {% for m in matches %}
+        <div class="col-lg-6">
+            <div class="vvk-card h-100 p-4 border-secondary border-opacity-25">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge {% if m.status == 'Live' %}bg-danger{% elif m.status == 'Completed' %}bg-success{% else %}bg-info{% endif %} bg-opacity-25 text-light border border-secondary">
+                        {{ m.status }}
+                    </span>
+                    <small class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{ m.match_date }}</small>
+                </div>
+
+                <h5 class="fw-bold text-light mb-3">{{ m.match_title }}</h5>
+
+                <div class="row align-items-center text-center p-3 rounded-3 bg-dark border border-secondary border-opacity-25 my-3">
+                    <div class="col-5">
+                        <h6 class="fw-bold text-warning mb-1">{{ m.team1 }}</h6>
+                        <span class="fs-5 fw-bold text-light">{{ m.score_team1 }}</span>
+                    </div>
+                    <div class="col-2">
+                        <span class="badge bg-secondary rounded-pill">VS</span>
+                    </div>
+                    <div class="col-5">
+                        <h6 class="fw-bold text-info mb-1">{{ m.team2 }}</h6>
+                        <span class="fs-5 fw-bold text-light">{{ m.score_team2 }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center text-muted small pt-2">
+                    <span><i class="bi bi-geo-alt me-1"></i> {{ m.venue }}</span>
+                    <strong class="text-light">{{ m.result }}</strong>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Player Roster Table -->
+    <div class="vvk-card">
+        <h5 class="fw-bold text-light mb-3"><i class="bi bi-people-fill text-danger me-2"></i> Official Squad Roster (Vivekanandha Warriors)</h5>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                <thead>
+                    <tr class="text-muted border-secondary border-opacity-25 small">
+                        <th>Player Name</th>
+                        <th>Role</th>
+                        <th>Batting Style</th>
+                        <th>Matches</th>
+                        <th>Runs</th>
+                        <th>Wickets</th>
+                        <th>Batting Avg</th>
+                        <th>Strike Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in players %}
+                    <tr class="border-secondary border-opacity-10 small">
+                        <td class="fw-bold text-light">{{ p.name }}</td>
+                        <td>
+                            <span class="badge bg-primary bg-opacity-20 text-primary">{{ p.role }}</span>
+                        </td>
+                        <td><small class="text-muted">{{ p.batting_style }}</small></td>
+                        <td>{{ p.matches_played }}</td>
+                        <td><strong class="text-warning">{{ p.runs_scored }}</strong></td>
+                        <td><strong class="text-info">{{ p.wickets_taken }}</strong></td>
+                        <td>{{ p.batting_avg }}</td>
+                        <td>{{ p.strike_rate }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No squad players registered.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Player Modal -->
+<div class="modal fade" id="addPlayerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: #111827; border: 1px solid var(--border-color); border-radius: 16px;">
+            <div class="modal-header border-secondary border-opacity-25">
+                <h5 class="modal-title text-light fw-bold"><i class="bi bi-person-plus-fill text-danger me-2"></i> Register Squad Player</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('cricket_club') }}">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Player Name</label>
+                        <input type="text" name="name" class="form-control vvk-input" placeholder="e.g. S. Gokul" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Role</label>
+                        <select name="role" class="form-select vvk-select">
+                            <option value="Batsman">Batsman</option>
+                            <option value="Bowler">Bowler</option>
+                            <option value="All-Rounder">All-Rounder</option>
+                            <option value="Wicket Keeper">Wicket Keeper</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Batting / Bowling Style</label>
+                        <input type="text" name="batting_style" class="form-control vvk-input" placeholder="e.g. Right Hand Bat / Right Arm Fast" value="Right Hand Bat">
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <label class="form-label text-muted small fw-semibold">Matches</label>
+                            <input type="number" name="matches" class="form-control vvk-input" value="10">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label text-muted small fw-semibold">Runs</label>
+                            <input type="number" name="runs" class="form-control vvk-input" value="280">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label text-muted small fw-semibold">Wickets</label>
+                            <input type="number" name="wickets" class="form-control vvk-input" value="5">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-vvk-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-vvk-primary">Save Player</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

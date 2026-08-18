@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Performance Prediction Using AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                Module #03 • Predictive AI & Academic Analytics
+            </span>
+            <h2 class="fw-bold text-light mb-1">Student Performance Prediction Using AI</h2>
+            <p class="text-muted small mb-0">Machine learning composite model evaluating internal test scores, attendance patterns, and study hours to forecast grades and generate proactive interventions.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Input Assessment Form -->
+        <div class="col-lg-5">
+            <div class="vvk-card h-100">
+                <h5 class="fw-bold text-light mb-3"><i class="bi bi-sliders text-primary me-2"></i> Academic Parameter Inputs</h5>
+                <form method="POST" action="{{ url_for('student_prediction') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Student Name</label>
+                            <input type="text" name="student_name" class="form-control vvk-input" placeholder="e.g. K. Sneha" required value="S. Divya">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Roll Number</label>
+                            <input type="text" name="roll_no" class="form-control vvk-input" placeholder="e.g. VVK23CS012" required value="VVK23CS088">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted small fw-semibold d-flex justify-content-between">
+                                <span>Attendance Percentage (%)</span>
+                                <span id="attVal" class="text-info fw-bold">85%</span>
+                            </label>
+                            <input type="range" name="attendance" min="40" max="100" value="85" class="form-range" oninput="document.getElementById('attVal').innerText = this.value + '%'">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Internal Exam 1 (Max 100)</label>
+                            <input type="number" name="internal1" min="0" max="100" class="form-control vvk-input" value="82" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Internal Exam 2 (Max 100)</label>
+                            <input type="number" name="internal2" min="0" max="100" class="form-control vvk-input" value="78" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Assignment Score (Max 100)</label>
+                            <input type="number" name="assignment" min="0" max="100" class="form-control vvk-input" value="90" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-semibold">Daily Study Hours</label>
+                            <input type="number" name="study_hours" step="0.5" min="0" max="12" class="form-control vvk-input" value="3.5" required>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-vvk-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-cpu-fill"></i>
+                                <span>Execute AI Prediction Model</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- AI Diagnostic Results -->
+        <div class="col-lg-7">
+            {% if result %}
+            <div class="vvk-card border-primary border-opacity-50 mb-4" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.9) 100%);">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 px-3 py-1 mb-1 rounded-pill">
+                            <i class="bi bi-check-circle-fill me-1"></i> AI Inference Generated
+                        </span>
+                        <h4 class="fw-bold text-light mb-0">{{ result.student_name }} ({{ result.roll_no }})</h4>
+                    </div>
+                    <div class="text-end">
+                        <div class="small text-muted">Predicted GPA</div>
+                        <h2 class="fw-bold text-info mb-0">{{ result.predicted_gpa }} / 10.0</h2>
+                    </div>
+                </div>
+
+                <div class="row g-3 my-2">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 text-center">
+                            <small class="text-muted d-block mb-1">Composite Score</small>
+                            <h4 class="fw-bold text-light mb-0">{{ result.score }}%</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 text-center">
+                            <small class="text-muted d-block mb-1">Expected Grade</small>
+                            <h4 class="fw-bold text-warning mb-0">{{ result.predicted_grade }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 text-center">
+                            <small class="text-muted d-block mb-1">Risk Profile</small>
+                            <h5 class="fw-bold text-success mb-0">{{ result.risk_level }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-3 mt-3 border border-secondary border-opacity-25" style="background: rgba(0,0,0,0.3);">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-robot text-info"></i>
+                        <strong class="text-light small">AI Personalised Academic Recommendations:</strong>
+                    </div>
+                    <p class="text-light mb-0 small lh-base">{{ result.recommendations }}</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="vvk-card text-center py-5 d-flex flex-column align-items-center justify-content-center h-100">
+                <i class="bi bi-graph-up-arrow text-muted fs-1 mb-3"></i>
+                <h5 class="text-light fw-bold">No Active Prediction Run</h5>
+                <p class="text-muted small max-w-400">Fill in the student academic metrics on the left form and hit Execute to generate composite ML analytics.</p>
+            </div>
+            {% endif %}
+
+            <!-- Prediction History Table -->
+            <div class="vvk-card mt-4">
+                <h6 class="fw-bold text-light mb-3"><i class="bi bi-clock-history text-primary me-2"></i> Recent Model Predictions</h6>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                        <thead>
+                            <tr class="text-muted border-secondary border-opacity-25 small">
+                                <th>Student</th>
+                                <th>Attendance</th>
+                                <th>Internal 1 & 2</th>
+                                <th>GPA</th>
+                                <th>Grade</th>
+                                <th>Risk Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for h in history %}
+                            <tr class="border-secondary border-opacity-10 small">
+                                <td>
+                                    <div class="fw-bold text-light">{{ h.student_name }}</div>
+                                    <small class="text-muted">{{ h.roll_no }}</small>
+                                </td>
+                                <td>{{ h.attendance_pct }}%</td>
+                                <td>{{ h.internal1_mark }} / {{ h.internal2_mark }}</td>
+                                <td><span class="badge bg-info bg-opacity-20 text-info">{{ h.predicted_gpa }}</span></td>
+                                <td><strong class="text-warning">{{ h.predicted_grade }}</strong></td>
+                                <td>
+                                    <span class="badge {% if 'High' in h.risk_level %}bg-danger{% elif 'Moderate' in h.risk_level %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                                        {{ h.risk_level }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">No history records logged yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
